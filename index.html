@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="SportPulse — scores, fixtures, results, standings and sports news in one place.">
+<title>SportPulse | All Sports, One Pulse</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0b1018);
+  --surface: light-dark(#ffffff, #121a26);
+  --surface-2: light-dark(#edf1f7, #192333);
+  --text: light-dark(#172033, #f3f6fb);
+  --muted: light-dark(#68758a, #a3b0c4);
+  --line: light-dark(#dfe5ee, #273449);
+  --accent: #b7ff3c;
+  --accent-ink: #142008;
+  --red: #ff5263;
+  --blue: #66a8ff;
+  --shadow: 0 16px 38px rgba(0,0,0,.12);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.app { min-height: 100vh; background: var(--bg); border-radius: 0; }
+.topbar { background: #0c121d; color: #f6f8fc; border-bottom: 1px solid #273246; position: sticky; top: 0; z-index: 20; }
+.top-inner { max-width: 1240px; margin: auto; padding: 15px 22px; display: flex; align-items: center; gap: 28px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 200px; font-weight: 900; font-size: 21px; letter-spacing: -.7px; }
+.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--accent); color: #10170a; font-weight: 1000; font-size: 19px; }
+.brand span em { color: var(--accent); font-style: normal; }
+.nav { display: flex; gap: 22px; color: #aeb9c9; font-size: 13px; font-weight: 700; flex: 1; }
+.nav a:hover, .nav a.active { color: #fff; }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.search { border: 1px solid #303c50; background: #151e2b; color: #fff; border-radius: 10px; padding: 10px 12px; width: 165px; outline: none; }
+.search:focus { border-color: var(--accent); }
+.icon-btn, .menu-btn { border: 1px solid #303c50; background: #151e2b; color: white; border-radius: 10px; padding: 9px 11px; }
+.menu-btn { display: none; }
+.ticker { background: #151e2b; color: #c8d1df; border-bottom: 1px solid #263144; font-size: 11px; }
+.ticker-inner { max-width: 1240px; margin: auto; padding: 9px 22px; display: flex; align-items: center; gap: 15px; overflow: hidden; white-space: nowrap; }
+.live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--red); margin-right: 6px; box-shadow: 0 0 0 4px #ff52631e; }
+.ticker strong { color: var(--accent); letter-spacing: 1px; }
+main { max-width: 1240px; margin: auto; padding: 28px 22px 60px; }
+.hero { display: grid; grid-template-columns: 1.45fr .85fr; gap: 18px; margin-bottom: 25px; }
+.hero-main { min-height: 270px; border-radius: 20px; overflow: hidden; position: relative; padding: 30px; background: radial-gradient(circle at 85% 20%, #344b28 0, transparent 32%), linear-gradient(130deg, #152333 0%, #111b28 55%, #253c25 100%); color: white; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #29384a; }
+.hero-main:after { content: "SP"; position: absolute; right: 22px; bottom: -55px; font-weight: 1000; font-size: 210px; letter-spacing: -22px; color: #ffffff08; pointer-events: none; }
+.eyebrow { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); font-size: 11px; font-weight: 900; letter-spacing: 1.6px; text-transform: uppercase; }
+.hero h1 { font-size: clamp(30px, 4vw, 47px); line-height: 1.04; letter-spacing: -1.8px; max-width: 520px; margin: 14px 0 12px; }
+.hero p { color: #bdc9d8; max-width: 450px; line-height: 1.65; margin: 0 0 20px; font-size: 14px; }
+.primary-btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 16px; font-size: 12px; font-weight: 900; display: inline-flex; align-items: center; gap: 9px; width: fit-content; }
+.hero-side { display: flex; flex-direction: column; gap: 14px; }
+.feature-card { flex: 1; border-radius: 17px; padding: 19px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; min-height: 125px; }
+.feature-top { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: .8px; }
+.feature-card h3 { font-size: 18px; margin: 15px 0 7px; letter-spacing: -.4px; }
+.feature-card p { color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; }
+.pill { padding: 5px 8px; border-radius: 6px; background: var(--surface-2); color: var(--muted); font-size: 10px; font-weight: 900; }
+.section { margin-top: 30px; }
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
+.section-head h2 { margin: 0; font-size: 21px; letter-spacing: -.6px; }
+.section-head p { color: var(--muted); font-size: 12px; margin: 5px 0 0; }
+.text-link { color: light-dark(#4b7511, #c6ff6b); font-weight: 800; font-size: 12px; background: none; border: 0; }
+.sport-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-btn { background: var(--surface); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 8px 13px; font-size: 12px; font-weight: 800; }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.content-grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 18px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 17px; overflow: hidden; }
+.panel-head { padding: 17px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.panel-head h3 { margin: 0; font-size: 14px; }
+.panel-head small { color: var(--muted); font-size: 10px; }
+.match-list { padding: 0 17px; }
+.match { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 74px 1fr auto; align-items: center; gap: 13px; }
+.match:last-child { border-bottom: 0; }
+.match-meta { color: var(--muted); font-size: 10px; line-height: 1.7; }
+.match-meta strong { display: block; color: var(--text); font-size: 10px; letter-spacing: .5px; }
+.teams { display: grid; gap: 9px; }
+.team { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 750; }
+.crest { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--surface-2); font-size: 10px; }
+.score { text-align: right; font-weight: 900; font-size: 14px; line-height: 1.7; }
+.score small { display: block; color: var(--muted); font-weight: 700; font-size: 9px; }
+.status-live { color: var(--red) !important; }
+.news-list { padding: 0 17px; }
+.news-item { display: grid; grid-template-columns: 74px 1fr; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.news-item:last-child { border-bottom: 0; }
+.news-art { min-height: 72px; border-radius: 10px; display: grid; place-items: center; font-size: 24px; background: linear-gradient(135deg, #283c50, #4a6b38); }
+.news-item:nth-child(2) .news-art { background: linear-gradient(135deg, #51374a, #bc7c40); }
+.news-item:nth-child(3) .news-art { background: linear-gradient(135deg, #254d5a, #5c7f9e); }
+.news-item:nth-child(4) .news-art { background: linear-gradient(135deg, #544c31, #9b8d50); }
+.news-item h4 { font-size: 12px; line-height: 1.45; margin: 3px 0 7px; }
+.news-item p { font-size: 10px; color: var(--muted); margin: 0; }
+.tag { color: light-dark(#547f17, #c5ff6b); text-transform: uppercase; letter-spacing: .8px; font-size: 9px; font-weight: 900; }
+.lower-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th { color: var(--muted); text-align: left; font-size: 9px; letter-spacing: .5px; text-transform: uppercase; padding: 12px 10px; background: var(--surface-2); }
+td { padding: 12px 10px; border-top: 1px solid var(--line); white-space: nowrap; }
+td:first-child { font-weight: 800; }
+.rank { color: var(--muted); width: 26px; display: inline-block; }
+.form { color: #4f8a24; letter-spacing: 2px; font-size: 10px; }
+.sports-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.sport-tile { border: 1px solid var(--line); border-radius: 13px; background: var(--surface); padding: 17px 12px; text-align: center; transition: transform .15s, border-color .15s; }
+.sport-tile:hover { transform: translateY(-2px); border-color: var(--accent); }
+.sport-tile span { display: block; font-size: 23px; margin-bottom: 8px; }
+.sport-tile strong { display: block; font-size: 11px; }
+.sport-tile small { display: block; color: var(--muted); font-size: 9px; margin-top: 5px; }
+.disclaimer { margin-top: 22px; padding: 13px 15px; background: var(--surface-2); color: var(--muted); border-radius: 11px; font-size: 11px; line-height: 1.6; }
+footer { background: #0c121d; color: #aeb9c9; padding: 28px 22px; }
+.footer-inner { max-width: 1240px; margin: auto; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; font-size: 11px; }
+.footer-brand { color: #fff; font-weight: 900; font-size: 15px; }
+.footer-brand em { color: var(--accent); font-style: normal; }
+.empty { padding: 25px; color: var(--muted); text-align: center; font-size: 12px; }
+@media (max-width: 850px) {
+  .top-inner { flex-wrap: wrap; gap: 13px; }
+  .brand { min-width: auto; flex: 1; }
+  .nav { order: 3; flex-basis: 100%; gap: 18px; overflow-x: auto; padding-top: 5px; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-main { min-height: 250px; }
+  .hero-side { display: grid; grid-template-columns: 1fr 1fr; }
+  .content-grid { grid-template-columns: 1fr; }
+  .sports-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .top-inner, main { padding-left: 14px; padding-right: 14px; }
+  .search { width: 120px; }
+  .nav { gap: 16px; font-size: 12px; }
+  main { padding-top: 17px; }
+  .hero-main { padding: 23px; min-height: 280px; }
+  .hero-side { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 34px; }
+  .section-head h2 { font-size: 19px; }
+  .lower-grid { grid-template-columns: 1fr; }
+  .match { grid-template-columns: 60px 1fr auto; gap: 8px; }
+  .match-list, .news-list { padding: 0 12px; }
+  .sports-grid { grid-template-columns: repeat(2, 1fr); }
+  .ticker-inner { padding-left: 14px; padding-right: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="app" id="top">
+  <header class="topbar">
+    <div class="top-inner">
+      <a class="brand" href="#top" aria-label="SportPulse home"><span class="brand-mark">S</span><span>SPORT<em>PULSE</em></span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a class="active" href="#scores">Scores</a>
+        <a href="#fixtures">Fixtures</a>
+        <a href="#news">News</a>
+        <a href="#standings">Standings</a>
+        <a href="#sports">All sports</a>
+      </nav>
+      <div class="header-actions">
+        <input class="search" id="siteSearch" type="search" placeholder="Search sports…" aria-label="Search sports news and matches">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle light and dark theme" title="Toggle theme">◐</button>
+      </div>
+    </div>
+  </header>
+  <div class="ticker"><div class="ticker-inner"><strong><span class="live-dot"></span>SPORTPULSE UPDATE</strong><span>All sports. All the action.</span><span>•</span><span>Scores, fixtures, results &amp; headlines in one place</span><span>•</span><span>Demo data shown until a live sports feed is connected</span></div></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-main">
+        <div><div class="eyebrow">● Your sports world, connected</div><h1>Every game.<br>Every story.<br><span style="color:var(--accent)">One pulse.</span></h1><p>Your home for scores, upcoming fixtures, league standings and the stories shaping sport around the world.</p></div>
+        <a class="primary-btn" href="#scores">Explore match centre <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero-side">
+        <article class="feature-card"><div class="feature-top"><span>01 / Match centre</span><span class="pill">ALL SPORTS</span></div><div><h3>Stay close to the action.</h3><p>Browse sample scores and upcoming fixtures by sport.</p></div></article>
+        <article class="feature-card"><div class="feature-top"><span>02 / The big picture</span><span class="pill">STANDINGS</span></div><div><h3>Follow the race.</h3><p>See how teams stack up in our demo league table.</p></div></article>
+      </div>
+    </section>
+
+    <section class="section" id="scores">
+      <div class="section-head"><div><h2>Match centre</h2><p>Scores and fixtures across the sports you follow.</p></div><span class="pill">DEMO DATA</span></div>
+      <div class="sport-filters" id="sportFilters" aria-label="Filter matches by sport">
+        <button class="filter-btn active" data-sport="All">All sports</button>
+        <button class="filter-btn" data-sport="Football">⚽ Football</button>
+        <button class="filter-btn" data-sport="Basketball">🏀 Basketball</button>
+        <button class="filter-btn" data-sport="Tennis">🎾 Tennis</button>
+        <button class="filter-btn" data-sport="Cricket">🏏 Cricket</button>
+        <button class="filter-btn" data-sport="Rugby">🏉 Rugby</button>
+        <button class="filter-btn" data-sport="Motorsport">🏎️ Motorsport</button>
+      </div>
+      <div class="content-grid">
+        <div class="panel" id="fixtures">
+          <div class="panel-head"><h3>Scores &amp; upcoming fixtures</h3><small>Illustrative examples</small></div>
+          <div class="match-list" id="matchList">
+            <article class="match" data-sport="Football" data-search="football north city riverside premier league"><div class="match-meta"><strong>FOOTBALL</strong>Demo League<br><span class="status-live">● SAMPLE</span></div><div class="teams"><div class="team"><span class="crest">NC</span>North City</div><div class="team"><span class="crest">RU</span>Riverside United</div></div><div class="score">2<br>1<small>Example</small></div></article>
+            <article class="match" data-sport="Basketball" data-search="basketball metro hawks coast giants"><div class="match-meta"><strong>BASKETBALL</strong>Demo League<br>Today · 19:30</div><div class="teams"><div class="team"><span class="crest">MH</span>Metro Hawks</div><div class="team"><span class="crest">CG</span>Coast Giants</div></div><div class="score">—<br>—<small>Fixture</small></div></article>
+            <article class="match" data-sport="Tennis" data-search="tennis alex morgan jamie lee"><div class="match-meta"><strong>TENNIS</strong>Demo Open<br>Tomorrow</div><div class="teams"><div class="team"><span class="crest">AM</span>Alex Morgan</div><div class="team"><span class="crest">JL</span>Jamie Lee</div></div><div class="score">—<br>—<small>Fixture</small></div></article>
+            <article class="match" data-sport="Cricket" data-search="cricket eastern eleven western club"><div class="match-meta"><strong>CRICKET</strong>Demo Cup<br>Tomorrow</div><div class="teams"><div class="team"><span class="crest">EE</span>Eastern Eleven</div><div class="team"><span class="crest">WC</span>Western Club</div></div><div class="score">—<br>—<small>Fixture</small></div></article>
+            <article class="match" data-sport="Rugby" data-search="rugby harbor rangers valley wolves"><div class="match-meta"><strong>RUGBY</strong>Demo Series<br>Sat · 16:00</div><div class="teams"><div class="team"><span class="crest">HR</span>Harbor Rangers</div><div class="team"><span class="crest">VW</span>Valley Wolves</div></div><div class="score">—<br>—<small>Fixture</small></div></article>
+            <article class="match" data-sport="Motorsport" data-search="motorsport grand prix qualifying"><div class="match-meta"><strong>MOTORSPORT</strong>Demo Grand Prix<br>Sun · 14:00</div><div class="teams"><div class="team"><span class="crest">GP</span>Grand Prix weekend</div><div class="team"><span class="crest">🏁</span>Race day</div></div><div class="score">—<br>—<small>Fixture</small></div></article>
+          </div>
+          <div class="empty" id="noMatches" hidden>No matches found. Try another sport or search term.</div>
+        </div>
+        <aside class="panel" id="news">
+          <div class="panel-head"><h3>Latest sports desk</h3><small>Sample headlines</small></div>
+          <div class="news-list" id="newsList">
+            <article class="news-item" data-search="football tactics team form"><div class="news-art">⚽</div><div><span class="tag">Football</span><h4>What to watch as the next round of fixtures approaches</h4><p>Analysis · 4 min read</p></div></article>
+            <article class="news-item" data-search="basketball season playoff"><div class="news-art">🏀</div><div><span class="tag">Basketball</span><h4>Five storylines that could shape the season</h4><p>Round-up · 3 min read</p></div></article>
+            <article class="news-item" data-search="tennis court grand slam"><div class="news-art">🎾</div><div><span class="tag">Tennis</span><h4>The match-ups fans will be talking about</h4><p>Preview · 5 min read</p></div></article>
+            <article class="news-item" data-search="athletics track field records"><div class="news-art">🏃</div><div><span class="tag">Athletics</span><h4>Records, rising talent and the races to follow</h4><p>Features · 4 min read</p></div></article>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="standings">
+      <div class="section-head"><div><h2>League standings</h2><p>A sample table showing how standings can look once connected to a verified data source.</p></div><span class="pill">EXAMPLE TABLE</span></div>
+      <div class="lower-grid">
+        <div class="panel"><div class="panel-head"><h3>Football · Demo League</h3><small>Illustrative only</small></div><div class="table-wrap"><table><thead><tr><th>Club</th><th>PL</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr></thead><tbody>
+          <tr><td><span class="rank">1</span>North City</td><td>10</td><td>7</td><td>2</td><td>1</td><td><strong>23</strong></td></tr>
+          <tr><td><span class="rank">2</span>Riverside Utd</td><td>10</td><td>6</td><td>2</td><td>2</td><td><strong>20</strong></td></tr>
+          <tr><td><span class="rank">3</span>Capital FC</td><td>10</td><td>5</td><td>3</td><td>2</td><td><strong>18</strong></td></tr>
+          <tr><td><span class="rank">4</span>Harbor Athletic</td><td>10</td><td>4</td><td>2</td><td>4</td><td><strong>14</strong></td></tr>
+        </tbody></table></div></div>
+        <div class="panel"><div class="panel-head"><h3>Standings guide</h3><span class="pill">QUICK READ</span></div><div style="padding:18px"><p style="font-size:12px;line-height:1.8;color:var(--muted);margin-top:0">League formats vary by sport. Football tables often show matches played (PL), wins (W), draws (D), losses (L), and points (Pts). Other sports use different ranking systems.</p><p style="font-size:12px;line-height:1.8;color:var(--muted);margin-bottom:0">Once a real data provider is connected, this area can show current standings, form, and competition-specific statistics.</p></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="sports">
+      <div class="section-head"><div><h2>Explore every sport</h2><p>Choose a sport to filter the match centre.</p></div></div>
+      <div class="sports-grid">
+        <button class="sport-tile" data-pick="Football"><span>⚽</span><strong>Football</strong><small>Scores &amp; leagues</small></button>
+        <button class="sport-tile" data-pick="Basketball"><span>🏀</span><strong>Basketball</strong><small>Games &amp; results</small></button>
+        <button class="sport-tile" data-pick="Tennis"><span>🎾</span><strong>Tennis</strong><small>Tours &amp; draws</small></button>
+        <button class="sport-tile" data-pick="Cricket"><span>🏏</span><strong>Cricket</strong><small>Matches &amp; series</small></button>
+        <button class="sport-tile" data-pick="Rugby"><span>🏉</span><strong>Rugby</strong><small>Fixtures &amp; tables</small></button>
+        <button class="sport-tile" data-pick="Motorsport"><span>🏎️</span><strong>Motorsport</strong><small>Race weekends</small></button>
+        <button class="sport-tile" data-pick="Athletics"><span>🏃</span><strong>Athletics</strong><small>Track &amp; field</small></button>
+        <button class="sport-tile" data-pick="Boxing"><span>🥊</span><strong>Boxing</strong><small>Fight calendar</small></button>
+        <button class="sport-tile" data-pick="Volleyball"><span>🏐</span><strong>Volleyball</strong><small>Matches &amp; sets</small></button>
+        <button class="sport-tile" data-pick="All"><span>🌍</span><strong>More sports</strong><small>Explore all</small></button>
+      </div>
+    </section>
+    <div class="disclaimer"><strong>Prototype notice:</strong> This is a front-end starter site. Scores, fixtures, headlines and standings shown here are examples, not live results. To launch a real sports service, replace sample content with licensed/authorized data, add a content workflow, and publish the site to a hosting provider. Avoid presenting sample scores as real.</div>
+  </main>
+  <footer><div class="footer-inner"><div class="footer-brand">SPORT<em>PULSE</em> <span style="font-weight:400;color:#8190a5">· All sports, one pulse.</span></div><div>Scores · Fixtures · News · Standings</div><div>© <span id="year"></span> SportPulse · Prototype</div></div></footer>
+</div>
+<script>
+(() => {
+  const filterButtons = [...document.querySelectorAll('.filter-btn')];
+  const matches = [...document.querySelectorAll('.match')];
+  const news = [...document.querySelectorAll('.news-item')];
+  const search = document.getElementById('siteSearch');
+  const noMatches = document.getElementById('noMatches');
+  let selectedSport = 'All';
+  let query = '';
+
+  function updateView() {
+    let visibleMatches = 0;
+    matches.forEach(item => {
+      const sportMatch = selectedSport === 'All' || item.dataset.sport === selectedSport;
+      const textMatch = !query || (item.dataset.search + ' ' + item.innerText).toLowerCase().includes(query);
+      const show = sportMatch && textMatch;
+      item.hidden = !show;
+      if (show) visibleMatches++;
+    });
+    noMatches.hidden = visibleMatches > 0;
+    news.forEach(item => {
+      item.hidden = !!query && !(item.dataset.search + ' ' + item.innerText).toLowerCase().includes(query);
+    });
+  }
+
+  filterButtons.forEach(button => button.addEventListener('click', () => {
+    selectedSport = button.dataset.sport;
+    filterButtons.forEach(b => b.classList.toggle('active', b === button));
+    updateView();
+    document.getElementById('scores').scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+  document.querySelectorAll('[data-pick]').forEach(button => button.addEventListener('click', () => {
+    const sport = button.dataset.pick;
+    const matching = filterButtons.find(b => b.dataset.sport === sport);
+    if (matching) matching.click();
+    else {
+      selectedSport = 'All';
+      filterButtons.forEach(b => b.classList.toggle('active', b.dataset.sport === 'All'));
+      search.value = sport;
+      query = sport.toLowerCase();
+      updateView();
+      document.getElementById('scores').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }));
+  search.addEventListener('input', () => {
+    query = search.value.trim().toLowerCase();
+    updateView();
+  });
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const root = document.documentElement;
+    const current = root.dataset.theme || 'auto';
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    root.style.colorScheme = next;
+  });
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
