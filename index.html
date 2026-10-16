@@ -40,7 +40,44 @@ const API='https://sportscore.com/api/widget/';const $=id=>document.getElementBy
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function group(m){const s=String(m.status||'').toLowerCase(),t=String(m.status_text||'').toLowerCase();if(s.includes('live')||t.includes('live')||t.includes('half')||t.includes('quarter'))return'live';if(s.includes('finish')||s.includes('complete')||t.includes('finished')||t.includes('full time'))return'finished';if(s.includes('upcoming')||s.includes('scheduled')||s.includes('not started')||t.includes('upcoming')||t.includes('scheduled'))return'upcoming';return s||'all';}
 function dateFmt(v){if(!v)return'';const d=new Date(v);return Number.isNaN(+d)?String(v):d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-function card(m){const home=m.home||m.home_team||m.home_name||'Home',away=m.away||m.away_team||m.away_name||'Away',hs=m.home_score??m.score_home??m.homeScore,as=m.away_score??m.score_away??m.awayScore;const logo=(u)=>u?`<img loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:'';return `<article class="card"><div class="match-top"><span>${esc(m.competition||m.league||sportNames[$('sportSelect').value])}</span><span class="status">${esc(m.status_text||m.status||'Match')}</span></div><div class="teamrow"><div class="team">${logo(m.home_logo||m.homeLogo)}<span class="team-name">${esc(home)}</span></div><span class="score">${hs==null?'—':esc(hs)}</span></div><div class="teamrow"><div class="team">${logo(m.away_logo||m.awayLogo)}<span class="team-name">${esc(away)}</span></div><span class="score">${as==null?'—':esc(as)}</span></div><div class="stamp">${esc(dateFmt(m.time||m.date||m.start_time))}</div></article>`;}
+function card(m){
+  const home=m.home||m.home_team||m.home_name||'Home';
+  const away=m.away||m.away_team||m.away_name||'Away';
+  const hs=m.home_score??m.score_home??m.homeScore;
+  const as=m.away_score??m.score_away??m.awayScore;
+  const competition=m.competition||m.league||sportNames[$('sportSelect').value];
+  const status=m.status_text||m.status||'Match';
+  const time=m.time||m.date||m.start_time||'Time unavailable';
+
+  const details=esc(
+    competition+'\n'+home+' '+(hs??'-')+' - '+(as??'-')+' '+away+
+    '\nStatus: '+status+'\nTime: '+time
+  );
+
+  return `<article class="card match-card" role="button" tabindex="0"
+    style="cursor:pointer"
+    onclick="alert(this.dataset.details)"
+    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"
+    data-details="${details.replace(/\n/g,'&#10;')}">
+    <div class="match-top">
+      <span>${esc(competition)}</span>
+      <span class="status">${esc(status)}</span>
+    </div>
+    <div class="teamrow">
+      <div class="team">
+        <span class="team-name">${esc(home)}</span>
+      </div>
+      <span class="score">${hs==null?'-':esc(hs)}</span>
+    </div>
+    <div class="teamrow">
+      <div class="team">
+        <span class="team-name">${esc(away)}</span>
+      </div>
+      <span class="score">${as==null?'-':esc(as)}</span>
+    </div>
+    <div class="stamp">${esc(dateFmt(time))}</div>
+  </article>`;
+}
 async function loadScores(){const sport=$('sportSelect').value,filter=$('statusSelect').value;$('scoreState').textContent='Loading…';$('matches').innerHTML='<div class="empty loading">Fetching match data…</div>';try{const r=await fetch(`${API}matches/?sport=${encodeURIComponent(sport)}&limit=30`,{cache:'no-store'});if(!r.ok)throw Error('Data service returned '+r.status);const d=await r.json();let arr=Array.isArray(d.matches)?d.matches:Array.isArray(d.data)?d.data:[];if(filter!=='all')arr=arr.filter(m=>group(m)===filter);$('matches').innerHTML=arr.length?arr.map(card).join(''):`<div class="empty">No ${filter==='all'?'match':filter} data currently available for ${sportNames[sport]}. Try another sport or filter.</div>`;$('scoreState').textContent='Connected';$('scoreUpdated').textContent='Last checked: '+new Date().toLocaleTimeString();}catch(e){$('scoreState').textContent='Unavailable';$('matches').innerHTML=`<div class="empty error">We couldn't load match data right now. Please try again later. (${esc(e.message)})</div>`;$('scoreUpdated').textContent='';}}
 async function loadStandings(){const sport=$('leagueSport').value,slug=$('leagueSlug').value;$('standingsTable').innerHTML='<p class="loading">Loading standings…</p>';try{const r=await fetch(`${API}standings/?sport=${encodeURIComponent(sport)}&slug=${encodeURIComponent(slug)}`);if(!r.ok)throw Error('No table found');const d=await r.json();let rows=Array.isArray(d.standings)?d.standings:Array.isArray(d.table)?d.table:Array.isArray(d.data)?d.data:Array.isArray(d)?d:[];if(rows.length&&Array.isArray(rows[0].table))rows=rows[0].table;if(!rows.length)throw Error('No rows returned');const val=(x,ks,def='—')=>{for(const k of ks)if(x[k]!=null)return x[k];return def;};$('standingsTable').innerHTML=`<table><thead><tr><th>#</th><th>Team / Player</th><th>Played</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${esc(val(x,['rank','position','place'],i+1))}</td><td>${esc(val(x,['team','team_name','name','club','participant']))}</td><td>${esc(val(x,['played','matches_played','pl','p']))}</td><td>${esc(val(x,['won','wins','w']))}</td><td>${esc(val(x,['drawn','draws','d']))}</td><td>${esc(val(x,['lost','losses','l']))}</td><td><strong>${esc(val(x,['points','pts','points_total']))}</strong></td></tr>`).join('')}</tbody></table>`;}catch(e){$('standingsTable').innerHTML='<p class="error">Standings could not be loaded for this selection. The provider may use a different competition slug. Try Premier League (football) or another competition.</p>';}}
 async function loadNews(){const topic=$('newsSport').value;const query=topic==='all sports'?'sports news':topic+' sports news';const rss='https://news.google.com/rss/search?q='+encodeURIComponent(query)+'&hl=en-US&gl=US&ceid=US:en';$('newsItems').innerHTML='<div class="empty loading">Fetching headlines…</div>';try{const url='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(rss);const r=await fetch(url);if(!r.ok)throw Error('News feed unavailable');const d=await r.json(),items=(d.items||[]).slice(0,9);if(!items.length)throw Error('No headlines returned');$('newsItems').innerHTML=items.map(x=>`<article class="card news-card"><div class="news-source">${esc(topic==='all sports'?'Sports news':topic)}</div><h3><a href="${esc(x.link||'#')}" target="_blank" rel="noopener">${esc(x.title||'Sports headline')}</a></h3><p>${esc((x.pubDate||'').slice(0,16))}</p><a href="${esc(x.link||'#')}" target="_blank" rel="noopener">Read article ↗</a></article>`).join('');}catch(e){const link='https://news.google.com/search?q='+encodeURIComponent(query);$('newsItems').innerHTML=`<div class="empty">The automatic news feed is unavailable right now. <a href="${link}" target="_blank" rel="noopener">Open latest ${esc(topic)} headlines on Google News ↗</a></div>`;}}
